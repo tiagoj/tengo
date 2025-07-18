@@ -1,10 +1,31 @@
-# The Tengo Language
+# The Tengo Language - Enhanced Fork
 
 [![GoDoc](https://godoc.org/github.com/d5/tengo/v2?status.svg)](https://godoc.org/github.com/d5/tengo/v2)
 ![test](https://github.com/d5/tengo/workflows/test/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/d5/tengo)](https://goreportcard.com/report/github.com/d5/tengo)
 
-**Tengo is a small, dynamic, fast, secure script language for Go.** 
+**This is an enhanced fork of the original Tengo language, featuring advanced closure capabilities with global variable access.**
+
+## Fork Enhancement: Closure-with-Globals
+
+This fork extends the original Tengo language with a powerful **Closure-with-Globals** feature that allows closures to access and modify global variables while maintaining their lexical scope. This enhancement enables more sophisticated programming patterns and better interoperability between Tengo scripts and Go applications.
+
+### Key New Features
+
+- **Enhanced Closure Capabilities**: Closures can now access global variables in addition to their lexical scope
+- **Bidirectional Global Access**: Both read and write operations on global variables from within closures
+- **Thread-Safe Operations**: Concurrent access to global variables is properly synchronized
+- **Backward Compatibility**: All existing Tengo code continues to work unchanged
+- **Performance Optimized**: Minimal overhead for the new functionality
+
+📚 **[Complete API Documentation](CLOSURE_WITH_GLOBALS_API.md)**  
+🚀 **[Migration Guide](CLOSURE_WITH_GLOBALS_MIGRATION_GUIDE.md)**  
+💡 **[Examples and Use Cases](CLOSURE_WITH_GLOBALS_EXAMPLES.md)**  
+🧪 **[Testing Documentation](TESTING_DOCUMENTATION.md)**  
+📊 **[Performance Benchmarks](PERFORMANCE_BENCHMARK_RESULTS.md)**  
+📋 **[Enhancement Plan](TENGO_ENHANCEMENT_PLAN.md)**
+
+**Original Tengo is a small, dynamic, fast, secure script language for Go.**
 
 Tengo is **[fast](#benchmark)** and secure because it's compiled/executed as
 bytecode on stack-based VM that's written in native Go.
@@ -31,6 +52,13 @@ fmt.println(sum("", [1, 2, 3]))  // "123"
 
 ## Features
 
+### Enhanced Features (This Fork)
+- **🚀 Closure-with-Globals**: Closures can access and modify global variables
+- **🔒 Thread-Safe**: Concurrent global variable access with proper synchronization
+- **⚡ High Performance**: Optimized implementation with minimal overhead
+- **🔄 Full Compatibility**: All existing Tengo code works without changes
+
+### Original Tengo Features
 - Simple and highly readable
   [Syntax](https://github.com/d5/tengo/blob/master/docs/tutorial.md)
   - Dynamic typing with type coercion
@@ -134,8 +162,80 @@ if err != nil {
 fmt.Println(res) // "success"
 ```
 
+## Closure-with-Globals Showcase
+
+The enhanced closure capabilities allow for powerful programming patterns:
+
+```golang
+package main
+
+import (
+	"context"
+	"fmt"
+	"github.com/d5/tengo/v2"
+)
+
+func main() {
+	// Showcase: Closure accessing and modifying global variables
+	script := tengo.NewScript([]byte(`
+// Global counter that closures can access
+counter := 0
+
+// Create a closure that increments the global counter
+increment := func(step) {
+    counter += step  // Closure modifies global variable
+    return counter
+}
+
+// Create another closure that reads the global counter
+getCount := func() {
+    return counter   // Closure reads global variable
+}
+
+// Use both closures
+result1 := increment(5)
+result2 := increment(3)
+current := getCount()
+`))
+
+	// Run the script
+	compiled, err := script.RunContext(context.Background())
+	if err != nil {
+		panic(err)
+	}
+
+	// Access results
+	result1 := compiled.Get("result1")
+	result2 := compiled.Get("result2")
+	current := compiled.Get("current")
+	counter := compiled.Get("counter")
+
+	fmt.Println("First increment:", result1)  // "5"
+	fmt.Println("Second increment:", result2) // "8"
+	fmt.Println("Current count:", current)    // "8"
+	fmt.Println("Final counter:", counter)    // "8"
+}
+```
+
+**Key Benefits:**
+- ✨ **Stateful Closures**: Closures can maintain and modify shared state
+- 🔄 **Bidirectional Access**: Both read and write operations on globals
+- 🔒 **Thread-Safe**: Automatic synchronization for concurrent access
+- 📚 **Rich Patterns**: Enables counters, caches, event handlers, and more
+
+> 📚 **For more examples and use cases, see [CLOSURE_WITH_GLOBALS_EXAMPLES.md](CLOSURE_WITH_GLOBALS_EXAMPLES.md)**
+
 ## References
 
+### Enhanced Fork Documentation
+- 📚 **[Closure-with-Globals API](CLOSURE_WITH_GLOBALS_API.md)** - Complete API reference
+- 🚀 **[Migration Guide](CLOSURE_WITH_GLOBALS_MIGRATION_GUIDE.md)** - How to upgrade existing code
+- 💡 **[Examples and Use Cases](CLOSURE_WITH_GLOBALS_EXAMPLES.md)** - Practical examples
+- 🧪 **[Testing Documentation](TESTING_DOCUMENTATION.md)** - Test coverage and validation
+- 📊 **[Performance Benchmarks](PERFORMANCE_BENCHMARK_RESULTS.md)** - Performance analysis
+- 📋 **[Enhancement Plan](TENGO_ENHANCEMENT_PLAN.md)** - Technical implementation details
+
+### Original Tengo Documentation
 - [Language Syntax](https://github.com/d5/tengo/blob/master/docs/tutorial.md)
 - [Object Types](https://github.com/d5/tengo/blob/master/docs/objects.md)
 - [Runtime Types](https://github.com/d5/tengo/blob/master/docs/runtime-types.md)
@@ -145,6 +245,8 @@ fmt.Println(res) // "success"
 - [Tengo CLI](https://github.com/d5/tengo/blob/master/docs/tengo-cli.md)
 - [Standard Library](https://github.com/d5/tengo/blob/master/docs/stdlib.md)
 - Syntax Highlighters: [VSCode](https://github.com/lissein/vscode-tengo), [Atom](https://github.com/d5/tengo-atom), [Vim](https://github.com/geseq/tengo-vim)
+
+### About
 - **Why the name Tengo?** It's from [1Q84](https://en.wikipedia.org/wiki/1Q84).
 
 
