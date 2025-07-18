@@ -80,8 +80,8 @@ func (e ErrInvalidArgumentType) Error() string {
 
 // ErrMissingExecutionContext represents an error where execution context is missing required components.
 type ErrMissingExecutionContext struct {
-	Function string
-	Missing  string
+	Function   string
+	Missing    string
 	Suggestion string
 }
 

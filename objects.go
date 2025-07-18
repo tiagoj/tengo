@@ -659,8 +659,8 @@ func (o *CompiledFunction) CallWithGlobalsExAndConstants(constants []Object, glo
 	// Require constants for proper execution
 	if constants == nil {
 		return nil, nil, ErrMissingExecutionContext{
-			Function: "compiled-function",
-			Missing:  "constants from original compilation",
+			Function:   "compiled-function",
+			Missing:    "constants from original compilation",
 			Suggestion: "use ExecutionContext or provide constants explicitly",
 		}
 	}
@@ -710,7 +710,7 @@ func (o *CompiledFunction) CallWithGlobalsExAndConstants(constants []Object, glo
 	vm.frames[0].fn = o
 	vm.frames[0].freeVars = o.Free
 	vm.frames[0].ip = -1
-	vm.frames[0].basePointer = vm.sp  // base pointer at the start of function arguments
+	vm.frames[0].basePointer = vm.sp // base pointer at the start of function arguments
 
 	// Set up the dummy main frame as the parent frame
 	vm.frames[1].fn = dummyMainFunction

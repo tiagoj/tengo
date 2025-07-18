@@ -77,8 +77,8 @@ func (ec *ExecutionContext) CallEx(fn *CompiledFunction, args ...Object) (Object
 	// Validate the function
 	if fn == nil {
 		return nil, nil, ErrMissingExecutionContext{
-			Function: "execution-context",
-			Missing:  "compiled function",
+			Function:   "execution-context",
+			Missing:    "compiled function",
 			Suggestion: "provide a valid CompiledFunction",
 		}
 	}
@@ -132,8 +132,8 @@ func (ec *ExecutionContext) Validate() error {
 
 	if ec.constants == nil {
 		return ErrMissingExecutionContext{
-			Function: "execution-context",
-			Missing:  "constants array",
+			Function:   "execution-context",
+			Missing:    "constants array",
 			Suggestion: "ensure ExecutionContext was created from a valid compiled script",
 		}
 	}

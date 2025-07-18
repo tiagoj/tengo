@@ -114,7 +114,7 @@ func TestExecutionContextValidation(t *testing.T) {
 
 	// Create a valid execution context
 	ctx := NewExecutionContext(compiled)
-	
+
 	// Test valid context
 	if err := ctx.Validate(); err != nil {
 		t.Errorf("Expected valid context to pass validation, got error: %v", err)

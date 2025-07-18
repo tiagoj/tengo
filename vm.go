@@ -68,7 +68,7 @@ func (v *VM) Abort() {
 func (v *VM) Run() (err error) {
 	// reset VM states (but preserve stack pointer if already set)
 	if v.sp == 0 {
-		v.sp = 0  // only reset if not already set
+		v.sp = 0 // only reset if not already set
 	}
 	v.curFrame = &(v.frames[0])
 	v.curInsts = v.curFrame.fn.Instructions
@@ -679,14 +679,14 @@ func (v *VM) run() {
 			}
 			//v.sp--
 			v.framesIndex--
-			
+
 			// Check if we're returning from the root frame
 			if v.framesIndex == 0 {
 				// We're returning from the root frame, so terminate execution
 				v.stack[v.sp-1] = retVal
 				return
 			}
-			
+
 			v.curFrame = &v.frames[v.framesIndex-1]
 			v.curInsts = v.curFrame.fn.Instructions
 			v.ip = v.curFrame.ip
