@@ -126,7 +126,7 @@ func TestClosureFromGoAPI(t *testing.T) {
 	copy(modifiedGlobals, globals)
 	// global_multiplier is typically at index 0
 	modifiedGlobals[0] = &tengo.Int{Value: 20}
-	
+
 	customCtx := ctx.WithGlobals(modifiedGlobals)
 	result2, err := customCtx.Call(multiplyByThreeFn, &tengo.Int{Value: 5})
 	require.NoError(t, err)
@@ -279,7 +279,7 @@ func TestNestedClosures(t *testing.T) {
 	require.True(t, ok)
 
 	ctx := tengo.NewExecutionContext(compiled)
-	
+
 	// Call level 2
 	level2Result, err := ctx.Call(nestedFn, &tengo.Int{Value: 200})
 	require.NoError(t, err)
