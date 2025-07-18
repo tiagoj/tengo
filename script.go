@@ -336,3 +336,24 @@ func (c *Compiled) Set(name string, value interface{}) error {
 	c.globals[idx] = obj
 	return nil
 }
+
+// Globals returns a copy of the global variables array. This is useful for
+// passing globals to closures that need access to the script's global state.
+func (c *Compiled) Globals() []Object {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+
+	// Return a copy to prevent external mutations
+	result := make([]Object, len(c.globals))
+	copy(result, c.globals)
+	return result
+}
+
+// Constants returns the constants array from the compiled bytecode. This is useful for
+// passing constants to closures that need access to the script's constants.
+func (c *Compiled) Constants() []Object {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+
+	return c.bytecode.Constants
+}

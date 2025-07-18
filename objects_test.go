@@ -160,6 +160,39 @@ func TestObject_BinaryOp(t *testing.T) {
 	require.Error(t, err)
 }
 
+func TestCompiledFunction_Call(t *testing.T) {
+	// Create a simple CompiledFunction with empty instructions
+	fn := &tengo.CompiledFunction{
+		Instructions:  []byte{},
+		NumLocals:     0,
+		NumParameters: 0,
+		VarArgs:       false,
+	}
+
+	// Empty function should return undefined without error
+	result, err := fn.Call()
+	require.NoError(t, err)
+	require.Equal(t, tengo.UndefinedValue, result)
+
+	// Test with arguments - should fail with argument count mismatch
+	_, err = fn.Call(&tengo.Int{Value: 1}, &tengo.Int{Value: 2})
+	require.Error(t, err)
+	require.Equal(t, "wrong number of arguments: want=0, got=2", err.Error())
+
+	// Create a function with non-empty instructions to test constants requirement
+	fnWithInstructions := &tengo.CompiledFunction{
+		Instructions:  []byte{0x01, 0x02}, // some dummy instructions
+		NumLocals:     0,
+		NumParameters: 0,
+		VarArgs:       false,
+	}
+
+	// Function with instructions should require constants
+	_, err = fnWithInstructions.Call()
+	require.Error(t, err)
+	require.Equal(t, "function 'compiled-function' requires constants from original compilation for execution - use ExecutionContext or provide constants explicitly", err.Error())
+}
+
 func TestArray_BinaryOp(t *testing.T) {
 	testBinaryOp(t, &tengo.Array{Value: nil}, token.Add,
 		&tengo.Array{Value: nil}, &tengo.Array{Value: nil})
