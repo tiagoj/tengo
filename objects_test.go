@@ -160,6 +160,26 @@ func TestObject_BinaryOp(t *testing.T) {
 	require.Error(t, err)
 }
 
+func TestCompiledFunction_Call(t *testing.T) {
+	// Create a simple CompiledFunction
+	fn := &tengo.CompiledFunction{
+		Instructions:  []byte{},
+		NumLocals:     0,
+		NumParameters: 0,
+		VarArgs:       false,
+	}
+
+	// Verify it can be called (should return error for now since CallWithGlobals is not implemented)
+	_, err := fn.Call()
+	require.Error(t, err)
+	require.Equal(t, "CallWithGlobals not yet implemented", err.Error())
+
+	// Test with arguments
+	_, err = fn.Call(&tengo.Int{Value: 1}, &tengo.Int{Value: 2})
+	require.Error(t, err)
+	require.Equal(t, "CallWithGlobals not yet implemented", err.Error())
+}
+
 func TestArray_BinaryOp(t *testing.T) {
 	testBinaryOp(t, &tengo.Array{Value: nil}, token.Add,
 		&tengo.Array{Value: nil}, &tengo.Array{Value: nil})

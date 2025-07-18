@@ -620,6 +620,18 @@ func (o *CompiledFunction) CanCall() bool {
 	return true
 }
 
+// Call invokes a compiled function with the given arguments.
+func (o *CompiledFunction) Call(args ...Object) (Object, error) {
+	return o.CallWithGlobals(nil, args...)
+}
+
+// CallWithGlobals invokes a compiled function with the given arguments and globals.
+func (o *CompiledFunction) CallWithGlobals(globals []Object, args ...Object) (Object, error) {
+	// TODO: This is a placeholder implementation for Step 3.1
+	// Will be properly implemented in Step 3.2
+	return UndefinedValue, fmt.Errorf("CallWithGlobals not yet implemented")
+}
+
 // Error represents an error value.
 type Error struct {
 	ObjectImpl

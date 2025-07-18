@@ -25,7 +25,6 @@ Assume you have Go installed (v1.18+ for Tengo compatibility) and Git. The total
 
 #### 1. **Setup and Branching (Preparation Phase)** - ✅ COMPLETE
    - **Actions:**
-     - ✅ Fork the official Tengo repository (github.com/d5/tengo) on GitHub to your account.
      - ✅ Clone the fork locally: `git clone https://github.com/yourusername/tengo.git`.
      - ✅ Checkout the latest stable tag or master: `git checkout master` (or e.g., `v2.12.0` if pinning a version).
      - ✅ Create a feature branch: `git checkout -b feat/closure-with-globals`.
@@ -33,6 +32,7 @@ Assume you have Go installed (v1.18+ for Tengo compatibility) and Git. The total
    - **Testing:**
      - ✅ Verify baseline: Ensure existing tests pass without changes.
    - **Milestone:** ✅ A clean, branched repo ready for modifications. Commit: "Initial branch setup."
+   - **Note:** Working with cloned d5/tengo repo directly instead of fork for development
 
 #### 2. **Analysis and Design (Planning Phase)** - ✅ COMPLETE
    - **Actions:**
@@ -49,24 +49,43 @@ Assume you have Go installed (v1.18+ for Tengo compatibility) and Git. The total
        - ✅ Ensure free variables (`Free []*ObjectPtr`) and args are handled correctly
        - ✅ Make globals copying efficient (e.g., use `copy` to avoid mutation issues)
    - **Testing:** ✅ No code changes yet; manually inspect with `go vet` or static analysis tools.
-   - **Milestone:** ✅ Document the design in a README note or commit message. Commit: "Design notes for closure globals support."
+   - **Milestone:** ✅ Design documented in plan. Analysis complete, ready for implementation.
+   - **Note:** Design notes documented in TENGO_ENHANCEMENT_PLAN.md rather than separate commit
 
 #### 3. **Incremental Implementation (Development Phase)**
    Break into small, testable commits. Each step builds on the previous, with changes limited to 1-2 files.
+   
+   **VALIDATION REQUIREMENTS FOR ALL STEPS:**
+   - ✅ `go build ./...` - Must compile without errors
+   - ✅ `go test ./...` - All tests must pass
+   - ✅ `go vet ./...` - No linting issues
+   - ✅ `go fmt ./...` - Code must be properly formatted
+   - ✅ No regressions in existing functionality
 
-   - **Step 3.1: Add Call Method to CompiledFunction (Basic Implementation)** - ⏳ NEXT
+   - **Step 3.1: Add Call Method to CompiledFunction (Basic Implementation)** - ✅ COMPLETE
      - **Actions:**
-       - ⏳ In `objects.go`, add basic `Call` method to `CompiledFunction` following UserFunction pattern:
+       - ✅ In `objects.go`, add basic `Call` method to `CompiledFunction` after line 621 (after CanCall method):
          ```go
+         // Call invokes a compiled function with the given arguments.
          func (o *CompiledFunction) Call(args ...Object) (Object, error) {
              return o.CallWithGlobals(nil, args...)
          }
          ```
-       - ⏳ This ensures CompiledFunction implements the same interface as UserFunction
+       - ✅ Add placeholder `CallWithGlobals` method to `CompiledFunction` (to be fully implemented in Step 3.2):
+         ```go
+         // CallWithGlobals invokes a compiled function with the given arguments and globals.
+         func (o *CompiledFunction) CallWithGlobals(globals []Object, args ...Object) (Object, error) {
+             // TODO: This is a placeholder implementation for Step 3.1
+             // Will be properly implemented in Step 3.2
+             return UndefinedValue, fmt.Errorf("CallWithGlobals not yet implemented")
+         }
+         ```
+       - ✅ This ensures CompiledFunction implements the same interface as UserFunction
      - **Testing:**
-       - ⏳ Add unit tests in `objects_test.go`: Test basic Call functionality
-       - ⏳ Run `go test .` to verify no regressions
-     - **Milestone:** ⏳ CompiledFunction has Call method. Commit: "Add Call method to CompiledFunction."
+       - ✅ Add unit test in `objects_test.go`: `TestCompiledFunction_Call` to verify Call method exists
+       - ✅ Test should expect error from placeholder CallWithGlobals implementation
+       - ✅ Run `go test .` to verify no regressions
+     - **Milestone:** ✅ CompiledFunction has Call method. Commit: "Add Call method to CompiledFunction."
 
    - **Step 3.2: Add CallWithGlobals Method to CompiledFunction (Core Implementation)** - ⏳ PENDING
      - **Actions:**
