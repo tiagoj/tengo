@@ -8,7 +8,14 @@
 
 ## Fork Enhancement: Closure-with-Globals
 
-This fork extends the original Tengo language with a powerful **Closure-with-Globals** feature that allows closures to access and modify global variables while maintaining their lexical scope. This enhancement enables more sophisticated programming patterns and better interoperability between Tengo scripts and Go applications.
+This fork addresses a specific limitation in the original Tengo implementation: **closures executed from Go code could not access global variables**, while closures executed inline within Tengo scripts worked perfectly. This enhancement enables sophisticated programming patterns and seamless interoperability between Tengo scripts and Go applications.
+
+### The Problem We Solved
+In original Tengo:
+- ✅ **Inline execution**: `closure()` within Tengo scripts could access globals
+- ❌ **Go code execution**: Closures called from Go lost access to global variables
+
+This fork provides new APIs that preserve the complete execution context when calling closures from Go.
 
 ### Key New Features
 
@@ -162,68 +169,59 @@ if err != nil {
 fmt.Println(res) // "success"
 ```
 
-## Closure-with-Globals Showcase
+## Closure-with-Globals Example
 
-The enhanced closure capabilities allow for powerful programming patterns:
+This fork enables closures to access global variables when called from Go code - a capability that previously only worked for inline execution within Tengo scripts.
 
-```golang
-package main
+**The Problem:** In original Tengo, this closure would fail when called from Go:
 
-import (
-	"context"
-	"fmt"
-	"github.com/d5/tengo/v2"
-)
+```tengo
+global_counter := 0
 
-func main() {
-	// Showcase: Closure accessing and modifying global variables
-	script := tengo.NewScript([]byte(`
-// Global counter that closures can access
-counter := 0
-
-// Create a closure that increments the global counter
-increment := func(step) {
-    counter += step  // Closure modifies global variable
-    return counter
-}
-
-// Create another closure that reads the global counter
-getCount := func() {
-    return counter   // Closure reads global variable
-}
-
-// Use both closures
-result1 := increment(5)
-result2 := increment(3)
-current := getCount()
-`))
-
-	// Run the script
-	compiled, err := script.RunContext(context.Background())
-	if err != nil {
-		panic(err)
-	}
-
-	// Access results
-	result1 := compiled.Get("result1")
-	result2 := compiled.Get("result2")
-	current := compiled.Get("current")
-	counter := compiled.Get("counter")
-
-	fmt.Println("First increment:", result1)  // "5"
-	fmt.Println("Second increment:", result2) // "8"
-	fmt.Println("Current count:", current)    // "8"
-	fmt.Println("Final counter:", counter)    // "8"
+calculator := func(input) {
+    global_counter += 1  // ❌ No access to globals from Go
+    return input * global_counter
 }
 ```
 
-**Key Benefits:**
-- ✨ **Stateful Closures**: Closures can maintain and modify shared state
-- 🔄 **Bidirectional Access**: Both read and write operations on globals
-- 🔒 **Thread-Safe**: Automatic synchronization for concurrent access
-- 📚 **Rich Patterns**: Enables counters, caches, event handlers, and more
+**The Solution:** Our enhanced ExecutionContext API enables full global access:
 
-> 📚 **For more examples and use cases, see [CLOSURE_WITH_GLOBALS_EXAMPLES.md](CLOSURE_WITH_GLOBALS_EXAMPLES.md)**
+```go
+// Create script with closure that uses globals
+script := tengo.NewScript([]byte(`
+    global_counter := 0
+    global_multiplier := 10
+    
+    calculator := func(input) {
+        global_counter += 1  // ✅ Now works from Go!
+        return input * global_multiplier + global_counter
+    }
+`))
+
+compiled, err := script.Compile()
+compiled.Run()
+
+// Get the closure and call it from Go
+calculatorVar := compiled.Get("calculator")
+calculatorFn := calculatorVar.Value().(*tengo.CompiledFunction)
+
+// Use ExecutionContext for global access
+ctx := tengo.NewExecutionContext(compiled)
+result, err := ctx.Call(calculatorFn, &tengo.Int{Value: 3})
+// Result: 31 (3 * 10 + 1)
+
+// Verify global state was modified
+counter := compiled.Get("global_counter")
+fmt.Println(counter.Value()) // 1
+```
+
+**Key Features:**
+- ✅ **Global Access**: Closures can read/write globals when called from Go
+- 🔄 **State Management**: Shared vs isolated execution contexts  
+- 🛡️ **Error Handling**: Tengo errors returned as objects, not Go errors
+- ⚡ **Performance**: Optimized for both inline and Go API execution
+
+**📖 [Complete Test Suite](./closure_inline_vs_go_test.go)** - See comprehensive examples demonstrating all differences between inline and Go API execution
 
 ## References
 

@@ -2,7 +2,104 @@
 
 ## Overview
 
-The Closure with Globals API enables calling Tengo closures from Go code while preserving their access to global variables and constants. This functionality allows closures to maintain their complete execution context when called outside of their original script environment.
+The Closure with Globals API solves a specific limitation in the original Tengo implementation: **closures executed from Go code could not access global variables**, while closures executed inline within Tengo scripts worked perfectly.
+
+### The Problem (Original Tengo)
+
+In the original Tengo implementation:
+- ✅ **Inline execution**: Closures called within Tengo scripts had full access to globals
+- ❌ **Go code execution**: Closures extracted and called from Go code lost access to globals
+
+This created a significant limitation when building Go applications that needed to call Tengo closures with access to global state.
+
+### The Solution (This Fork)
+
+This enhanced fork provides APIs that enable calling Tengo closures from Go code while preserving their complete execution context, including access to global variables and constants.
+
+## Before vs After Comparison
+
+### ❌ Original Tengo - What Didn't Work
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/d5/tengo/v2"
+)
+
+func main() {
+    script := tengo.NewScript([]byte(`
+        counter := 0  // Global variable
+        
+        increment := func(step) {
+            counter += step    // ❌ This won't work when called from Go!
+            return counter
+        }
+        
+        // ✅ This works fine - inline execution within Tengo
+        inline_result := increment(5)  // counter becomes 5
+    `))
+    
+    compiled, _ := script.RunContext(context.Background())
+    
+    // Extract the closure to call from Go
+    incrementVar := compiled.Get("increment")
+    incrementFn := incrementVar.Value().(*tengo.CompiledFunction)
+    
+    // ❌ This call will fail - closure can't access 'counter'
+    result, err := incrementFn.Call(&tengo.Int{Value: 10})
+    if err != nil {
+        fmt.Println("Error:", err) // Runtime error - undefined variable 'counter'
+    }
+}
+```
+
+### ✅ Enhanced Fork - What Now Works
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/d5/tengo/v2"
+)
+
+func main() {
+    script := tengo.NewScript([]byte(`
+        counter := 0  // Global variable
+        
+        increment := func(step) {
+            counter += step    // ✅ This now works from Go too!
+            return counter
+        }
+        
+        // ✅ This still works - inline execution within Tengo
+        inline_result := increment(5)  // counter becomes 5
+    `))
+    
+    compiled, _ := script.RunContext(context.Background())
+    
+    // Create execution context to preserve globals
+    ctx := tengo.NewExecutionContext(compiled)
+    
+    // Extract the closure to call from Go
+    incrementVar := compiled.Get("increment")
+    incrementFn := incrementVar.Value().(*tengo.CompiledFunction)
+    
+    // ✅ This now works perfectly - closure can access 'counter'
+    result, err := ctx.Call(incrementFn, &tengo.Int{Value: 10})
+    if err != nil {
+        fmt.Println("Error:", err)
+    } else {
+        fmt.Println("Result:", result.(*tengo.Int).Value) // 15 (5 + 10)
+    }
+    
+    // ✅ Global state is properly maintained
+    counterVar := compiled.Get("counter")
+    fmt.Println("Final counter:", counterVar.Value().(*tengo.Int).Value) // 15
+}
+```
 
 ## Key Concepts
 
