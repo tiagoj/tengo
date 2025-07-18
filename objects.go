@@ -627,9 +627,126 @@ func (o *CompiledFunction) Call(args ...Object) (Object, error) {
 
 // CallWithGlobals invokes a compiled function with the given arguments and globals.
 func (o *CompiledFunction) CallWithGlobals(globals []Object, args ...Object) (Object, error) {
-	// TODO: This is a placeholder implementation for Step 3.1
-	// Will be properly implemented in Step 3.2
-	return UndefinedValue, fmt.Errorf("CallWithGlobals not yet implemented")
+	result, _, err := o.CallWithGlobalsEx(globals, args...)
+	return result, err
+}
+
+// CallWithGlobalsEx invokes a compiled function with the given arguments and globals,
+// and returns both the result and the updated globals (if any were modified).
+func (o *CompiledFunction) CallWithGlobalsEx(globals []Object, args ...Object) (Object, []Object, error) {
+	return o.CallWithGlobalsExAndConstants(nil, globals, args...)
+}
+
+// CallWithGlobalsExAndConstants invokes a compiled function with the given arguments, globals, and constants,
+// and returns both the result and the updated globals (if any were modified).
+func (o *CompiledFunction) CallWithGlobalsExAndConstants(constants []Object, globals []Object, args ...Object) (Object, []Object, error) {
+	// Validate arguments count
+	if o.VarArgs {
+		if len(args) < o.NumParameters-1 {
+			return nil, nil, fmt.Errorf("wrong number of arguments: want>=%d, got=%d", o.NumParameters-1, len(args))
+		}
+	} else {
+		if len(args) != o.NumParameters {
+			return nil, nil, fmt.Errorf("wrong number of arguments: want=%d, got=%d", o.NumParameters, len(args))
+		}
+	}
+
+	// Handle empty bytecode case - just return undefined
+	if len(o.Instructions) == 0 {
+		return UndefinedValue, globals, nil
+	}
+
+	// Require constants for proper execution
+	if constants == nil {
+		return nil, nil, ErrMissingExecutionContext{
+			Function: "compiled-function",
+			Missing:  "constants from original compilation",
+			Suggestion: "use ExecutionContext or provide constants explicitly",
+		}
+	}
+
+	// Validate constants array
+	for i, constant := range constants {
+		if constant == nil {
+			return nil, nil, ErrInvalidConstantsArray{
+				Reason: "nil constant",
+				Index:  i,
+			}
+		}
+	}
+
+	// Make a copy of globals to avoid modifying the original
+	var vmGlobals []Object
+	if globals != nil {
+		vmGlobals = make([]Object, len(globals))
+		copy(vmGlobals, globals)
+	} else {
+		vmGlobals = make([]Object, GlobalsSize)
+		// Initialize all globals to UndefinedValue
+		for i := range vmGlobals {
+			vmGlobals[i] = UndefinedValue
+		}
+	}
+
+	// Create a simple VM with just the necessary constants
+	vm := &VM{
+		constants:   constants,
+		sp:          0,
+		globals:     vmGlobals,
+		fileSet:     nil,
+		framesIndex: 2,
+		ip:          -1,
+		maxAllocs:   -1, // no allocation limit
+	}
+
+	// Create a dummy main function for the parent frame
+	dummyMainFunction := &CompiledFunction{
+		Instructions:  []byte{},
+		NumLocals:     0,
+		NumParameters: 0,
+	}
+
+	// Set up the actual function frame at frame 0 (where VM expects to start)
+	vm.frames[0].fn = o
+	vm.frames[0].freeVars = o.Free
+	vm.frames[0].ip = -1
+	vm.frames[0].basePointer = vm.sp  // base pointer at the start of function arguments
+
+	// Set up the dummy main frame as the parent frame
+	vm.frames[1].fn = dummyMainFunction
+	vm.frames[1].ip = -1
+
+	// Set current frame to the actual function frame
+	vm.curFrame = &vm.frames[0]
+	vm.curInsts = o.Instructions
+	vm.ip = -1
+
+	// Put the function arguments on the stack
+	for _, arg := range args {
+		vm.stack[vm.sp] = arg
+		vm.sp++
+	}
+
+	// Allocate space for local variables
+	for i := len(args); i < o.NumLocals; i++ {
+		vm.stack[vm.sp] = UndefinedValue
+		vm.sp++
+	}
+
+	// Run the function
+	err := vm.Run()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Get the result from the VM stack
+	var result Object = UndefinedValue
+	if vm.sp > 0 {
+		result = vm.stack[vm.sp-1]
+	}
+
+	// Return the result and updated globals
+	return result, vm.globals, nil
 }
 
 // Error represents an error value.
