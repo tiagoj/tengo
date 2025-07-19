@@ -1,6 +1,6 @@
 # The Tengo Language - Enhanced Fork
 
-[![GoDoc](https://godoc.org/github.com/d5/tengo/v2?status.svg)](https://godoc.org/github.com/d5/tengo/v2)
+[![GoDoc](https://godoc.org/github.com/tiagoj/tengo/v2?status.svg)](https://godoc.org/github.com/tiagoj/tengo/v2)
 ![test](https://github.com/d5/tengo/workflows/test/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/d5/tengo)](https://goreportcard.com/report/github.com/d5/tengo)
 
@@ -108,7 +108,7 @@ _* See [here](https://github.com/d5/tengobench) for commands/codes used_
 ## Quick Start
 
 ```
-go get github.com/d5/tengo/v2
+go get github.com/tiagoj/tengo/v2
 ```
 
 A simple Go example code that compiles/runs Tengo script code with some input/output values:
@@ -120,7 +120,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/d5/tengo/v2"
+	"github.com/tiagoj/tengo/v2"
 )
 
 func main() {
@@ -156,7 +156,7 @@ each([a, b, c, d], func(x) {
 }
 ```
 
-Or, if you need to evaluate a simple expression, you can use [Eval](https://pkg.go.dev/github.com/d5/tengo/v2#Eval) function instead:
+Or, if you need to evaluate a simple expression, you can use [Eval](https://pkg.go.dev/github.com/tiagoj/tengo/v2#Eval) function instead:
 
 
 ```golang

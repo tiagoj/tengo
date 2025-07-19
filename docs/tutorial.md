@@ -516,7 +516,7 @@ Thus, `sum := import("./sum")` is equivalent to `sum := import("./sum.tengo")`.
     If using Tengo as a library in Go, the file extension name "`.tengo`" can
     be customized. In that case, use the `SetImportFileExt` function of the
     `Compiler` type.
-    See the [Go reference](https://pkg.go.dev/github.com/d5/tengo/v2) for details.
+    See the [Go reference](https://pkg.go.dev/github.com/tiagoj/tengo/v2) for details.
 
 In Tengo, modules are very similar to functions.
 

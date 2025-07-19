@@ -3,7 +3,7 @@ package stdlib
 import (
 	"os"
 
-	"github.com/d5/tengo/v2"
+	"github.com/tiagoj/tengo/v2"
 )
 
 func makeOSFile(file *os.File) *tengo.ImmutableMap {

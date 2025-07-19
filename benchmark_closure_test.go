@@ -3,7 +3,7 @@ package tengo_test
 import (
 	"testing"
 
-	"github.com/d5/tengo/v2"
+	"github.com/tiagoj/tengo/v2"
 )
 
 // BenchmarkClosureInlineExecution benchmarks closure execution performance inline in script.

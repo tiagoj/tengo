@@ -25,7 +25,7 @@ package main
 
 import (
     "fmt"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 func main() {
@@ -62,7 +62,7 @@ package main
 
 import (
     "fmt"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 func main() {

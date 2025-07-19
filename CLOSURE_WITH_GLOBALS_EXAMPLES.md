@@ -22,7 +22,7 @@ package main
 
 import (
     "fmt"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 func main() {
@@ -92,7 +92,7 @@ package main
 import (
     "fmt"
     "sync"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 func main() {
@@ -168,7 +168,7 @@ package main
 
 import (
     "fmt"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 func main() {
@@ -253,7 +253,7 @@ package main
 import (
     "fmt"
     "log"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 type ClosureExecutor struct {
@@ -367,7 +367,7 @@ import (
     "fmt"
     "sync"
     "time"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 func main() {
@@ -473,7 +473,7 @@ package main
 
 import (
     "fmt"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 func main() {
@@ -588,7 +588,7 @@ package main
 
 import (
     "fmt"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 func main() {
@@ -732,7 +732,7 @@ package main
 
 import (
     "fmt"
-    "github.com/d5/tengo/v2"
+    "github.com/tiagoj/tengo/v2"
 )
 
 func main() {

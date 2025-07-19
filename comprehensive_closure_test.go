@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/d5/tengo/v2"
-	"github.com/d5/tengo/v2/require"
+	"github.com/tiagoj/tengo/v2"
+	"github.com/tiagoj/tengo/v2/require"
 )
 
 // TestClosureBasicFunctionality tests basic closure functionality in inline scripts

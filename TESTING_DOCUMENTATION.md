@@ -149,7 +149,7 @@ go test -cover ./...
 
 ### Test Dependencies
 - **Testing Framework**: Go's built-in `testing` package
-- **Assertion Library**: `github.com/d5/tengo/v2/require`
+- **Assertion Library**: `github.com/tiagoj/tengo/v2/require`
 - **Test Data**: Synthetic Tengo scripts for various scenarios
 - **Concurrency**: Go's goroutine and channel primitives
 
